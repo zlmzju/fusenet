@@ -53,7 +53,7 @@ def train(args):
     kv = mx.kvstore.create(args.kv_store)    
     devs = [mx.gpu(i) for i in range(len(args.gpus.split(',')))]
     #training data
-    (train, val)=get_iterator(args, kv)
+    (train_data, val_data)=get_iterator(args, kv)
     #model
     model = mx.model.FeedForward(
         ctx=devs,
@@ -70,8 +70,8 @@ def train(args):
         **args.model_args #for retrain
     )
     model.fit(
-        X=train,
-        eval_data=val,
+        X=train_data,
+        eval_data=val_data,
         eval_metric=['ce','acc'] if args.dataset!='imagenet' else ['ce','acc',mx.metric.create('top_k_accuracy',top_k=5)],
         kvstore=kv,
         batch_end_callback=utility.InfoCallback(args.batch_size, 50),

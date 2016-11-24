@@ -8,7 +8,7 @@ This project contains the models used for the experiments in the paper:
 [Zhuowen Tu](http://pages.ucsd.edu/~ztu/), 
 and [Wenjun Zeng](https://www.microsoft.com/en-us/research/people/wezeng/). 
 "On the Connection of Deep Fusion to Ensembling." 
-arXiv preprint [arXiv:1611.xxxx](http://arxiv.org/abs/1611.xxxxx) (2016).
+arXiv preprint [arXiv:1611.07718](http://arxiv.org/abs/1611.07718) (2016).
 
 Contact: Liming Zhao (zhaoliming@zju.edu.cn)
 
@@ -114,8 +114,8 @@ Please cite our papers on deep fusion in your publications if it helps your rese
                Wenjun Zeng},
   title     = {On the Connection of Deep Fusion to Ensembling},
   journal   = {CoRR},
-  volume    = {abs/1611.xxxxx},
+  volume    = {abs/1611.07718},
   year      = {2016},
-  url       = {http://arxiv.org/abs/1611.xxxxx},
+  url       = {http://arxiv.org/abs/1611.07718},
 }
 ```
