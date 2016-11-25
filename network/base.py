@@ -5,7 +5,7 @@ Contact: Liming Zhao (zlmzju@gmail.com)
 import mxnet as mx
 
 class FuseNet(object):
-    def __init__(self,num_classes=10, num_depth=50, widen_factor=1):
+    def __init__(self,num_classes, num_depth, widen_factor):
         self.num_classes=num_classes        #classification number (cifar10 is 10, cifar100 is 100)
         self.num_depth=num_depth            #corresponding plain network depth
         self.num_channels=16*widen_factor   #first conv channels number
@@ -51,7 +51,7 @@ class FuseNet(object):
         return fc
 
     #caculate the number of blocks for each group
-    def set_blocks(self, block_depth=2, num_group=3):
+    def set_blocks(self, block_depth, num_group=3):
         self.num_blocks=[]
         # based on depth of each basic fusion block
         exclude_depth=2

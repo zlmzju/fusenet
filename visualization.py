@@ -26,7 +26,7 @@ def _str2tuple(string):
     """
     return re.findall(r"\d+", string)
 
-def plot_network(symbol, title="plot", shape=None, node_attrs={}):
+def plot_network(symbol, shape=None, node_attrs={},ignore_nodes=[], title="plot"):
     """convert symbol to dot object for visualization
 
     Parameters
@@ -86,7 +86,6 @@ def plot_network(symbol, title="plot", shape=None, node_attrs={}):
     # cm=all_colors[:9]
     # cm_left=all_colors[10:]
     # make nodes
-    ignore_nodes=["Activation","BatchNorm","Flatten","_MulScalar","Pooling","SoftmaxOutput"]
     conv_num=0
     global_conv_num=0
     left_conv_num=0

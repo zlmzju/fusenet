@@ -14,6 +14,6 @@ class PlainNet(FuseNet):
         data= self.get_one(name+'_p1', data, kin, kout, relu=True)
         return data
 
-def get_symbol(num_classes=10, num_depth=50, widen_factor=1):
+def get_symbol(num_classes, num_depth, widen_factor):
     net=PlainNet(num_classes,num_depth, widen_factor)
     return net.get_symbol()

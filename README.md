@@ -56,13 +56,13 @@ git clone --recursive -b fusenet https://github.com/zlmzju/mxnet.git
 
 ## How to Train
 
-Step by step tutorial with jupyter notebook will be available soon.
+Step by step tutorial with jupyter notebook is now available, please check the file [tutorial.ipynb](tutorial.ipynb).
 
 ### dataset
 You can prepare the `*.rec` file by yourself, or simply download the `Cifar` dataset from [data.dmlc.ml](http://data.dmlc.ml/mxnet/data/) or my [google drive](https://drive.google.com/open?id=0By55MQnF3PHCQmRhRTBuWk5DRkk), which includes both `Cifar` and `SVHN` datasets.
 
 ### training
-Current code supports training different deeply-fused nets on Cifar-10, Cifar-100 and SVHN, such as `plain` network, `resnet`, `cross` (dfn-mr),`half` (dfn-il), `side` (dfn-il without identities), `fuse3` (three fusions), `fuse6` (three fusions), and `ensemble` (with sharing weights, training code will come later). All the networks are contained in the `network` folder.
+Current code supports training different deeply-fused nets on Cifar-10, Cifar-100 and SVHN, such as `plain` network, `resnet`, `cross` (dfn-mr),`half` (dfn-il), `side` (dfn-il without identities), `fuse3` (three fusions), `fuse6` (six fusions), and `ensemble` (with sharing weights, training code will come later). All the networks are contained in the `network` folder.
 
 Note that the codes for training on `ImageNet`  are available in the `network/imagenet` folder, but they still need refactoring to merge into the main codes.
 
@@ -75,13 +75,13 @@ python train_model.py --dataset=cifar10 --network=cross --depth=56 --gpus=0,1 --
 ## Other usages
 
 ### visualization
-If you wish to show the network architecture, run the following command to visualize the network.
+If you want to show the network architecture, run the following command to visualize the network.
 
 ```shell
 python show_model.py --network=half --depth=26 --widen-factor=1
 ```
 
-You will obtain a picture [half_d26.png](./visualize/half_d26.png) in the [`visualize`](./visualize/) folder, and more examples can be found there.
+You will obtain a picture [half_d26.png](./visualize/half_d26.png) in the [visualize](./visualize/) folder, and more examples can be found there.
 
 Note that you may need to install [graphviz](http://graphviz.readthedocs.io/en/latest/manual.html#installation) for visualization.
 

@@ -5,6 +5,7 @@ Contact: Liming Zhao (zlmzju@gmail.com)
 import mxnet as mx
 import argparse
 import os
+import sys
 import logging
 import numpy as np
 import options
@@ -74,13 +75,13 @@ def train(args):
         eval_data=val_data,
         eval_metric=['ce','acc'] if args.dataset!='imagenet' else ['ce','acc',mx.metric.create('top_k_accuracy',top_k=5)],
         kvstore=kv,
-        batch_end_callback=utility.InfoCallback(args.batch_size, 50),
-        epoch_end_callback=mx.callback.do_checkpoint(args.model_prefix,args.num_epochs/8),
+        batch_end_callback=utility.InfoCallback(args.batch_size, args.log_iters),
+        epoch_end_callback=mx.callback.do_checkpoint(args.model_prefix,args.checkpoint_epochs),
     )
 
-def main():
-    args = options.get_args()
+def main(argv):
+    args = options.get_args(argv)
     train(args)
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

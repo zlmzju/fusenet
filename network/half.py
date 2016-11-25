@@ -19,6 +19,6 @@ class HalfNet(FuseNet):
         data = mx.symbol.Activation(name=name+'_relu', data=data, act_type='relu')
         return data
 
-def get_symbol(num_classes=10, num_depth=50, widen_factor=1):
+def get_symbol(num_classes, num_depth, widen_factor):
     net=HalfNet(num_classes,num_depth, widen_factor)
     return net.get_symbol()

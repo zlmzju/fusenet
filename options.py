@@ -47,7 +47,7 @@ def __dataset_args(args):
         args.data_shape=224
         args.num_examples=1281167
         args.num_classes=1000 
-        args.mean_rgb=[123.370, 112.757, 99.406] #calculated on the resized training data
+        args.mean_rgb=[123.370, 112.757, 99.406] #calculated on the resized training data (short side = 480)
         args.std_rgb=[68.998, 66.093, 68.292]
         args.aug_type=2 #extreme data augmentation
         args.test_batch_size=200 if args.batch_size<200 else args.batch_size
@@ -66,6 +66,13 @@ def __logging_args(args):
         while os.path.isfile(args.model_prefix+logfile_name+str(random_idx)+'.txt'):
             random_idx+=1
         logfile_name+=str(random_idx)
+    #model related
+    if args.checkpoint_epochs is None: #if num_epochs=400, then we will save the model every 50 epochs
+        args.checkpoint_epochs=args.num_epochs/8
+    if args.rand_seed is None:
+        import time     
+        args.rand_seed=int(time.time()) #different random init for serveral runs
+    mx.random.seed(args.rand_seed)      #cudnn conv backward is non-deterministic
     #logging
     log_file_full_name = args.model_prefix+logfile_name+'.txt'
     args.model_prefix+='weights/'+logfile_name+'/'
@@ -73,6 +80,7 @@ def __logging_args(args):
     args.model_prefix+=logfile_name
     head = '%(asctime)-15s %(message)s'
     logger = logging.getLogger()
+    map(logger.removeHandler, logger.handlers[:]) #reset
     handler = logging.FileHandler(log_file_full_name)
     formatter = logging.Formatter(head)
     handler.setFormatter(formatter)
@@ -85,10 +93,6 @@ def __logging_args(args):
     logger.info('start with arguments %s', args)
 
 def __training_args(args):
-    if args.rand_seed is None:
-        import time     
-        args.rand_seed=int(time.time()) #different random init for serveral runs
-    mx.random.seed(args.rand_seed)      #cudnn conv backward is non-deterministic
     if args.lr_steps is None:
         args.lr_steps=[args.num_epochs*1/2,args.num_epochs*3/4,args.num_epochs*7/8]
     else:
@@ -107,19 +111,21 @@ def __training_args(args):
                 args.lr_steps.append(tmp_lr-args.load_epoch)
     #gpus
     logging.info("Using gpus %s from:\n%s",args.gpus, os.popen("nvidia-smi -L").read())
-    logging.info('training strategy: lr=%f, step=%s, seed=%d',args.lr,args.lr_steps,args.rand_seed)
+    logging.info('training strategy: lr=%f, step=%s',args.lr,args.lr_steps)
     os.environ["CUDA_VISIBLE_DEVICES"]=args.gpus
 
-def get_args(parse=True):
+def get_args(argv,parse=True):
     parser = argparse.ArgumentParser(description='train an deep fusion network: "python train_model.py cifar10 resnet 56"')
     #network parameters
     parser.add_argument('--network', type=str, default='cross', help = 'network name')
-    parser.add_argument('--depth', type=int, default=62, help = 'depth of the corresponding plain network (62 actually is 32 depth)')
+    parser.add_argument('--depth', type=int, default=62, help = 'depth of the corresponding plain network (if 62 for CrossNet, the actual depth is 32)')
     parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10','cifar100','svhn', 'imagenet'], help='dataset name')
     parser.add_argument('--widen-factor', type=int, default=1, help='channel number based on 16')
     #for logging experiments
     parser.add_argument('--log-dir', type=str, default='./snapshot/', help='directory of the log file')
     parser.add_argument('--exp-name', type=str, help='experiment description for logging same network')
+    parser.add_argument('--checkpoint-epochs', type=int, help='save the model every N epochs')  
+    parser.add_argument('--log-iters', type=int, default=50, help='logging info every N iterations')  
     #training strategy
     parser.add_argument('--gpus', type=str, default='0,1', help='the gpus will be used, e.g., --gpus=0,1')
     parser.add_argument('--batch-size', type=int, default=64, help='the training batch size')
@@ -147,7 +153,7 @@ def get_args(parse=True):
     parser.add_argument('--model-args', type=dict, default={}, help="internal usage for loading model")
     #mxnet for multi-gpu update
     parser.add_argument('--kv-store', type=str, default='device', help='the kvstore type in mxnet')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     #parse arguments
     parse_args(args,parse)
     return args
