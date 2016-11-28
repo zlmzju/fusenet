@@ -48,7 +48,7 @@ DFN-MR3 |   50  |  24.8M  | **3.57** | **19.00**|   1.55
 git pull origin pull/3936/head master
     ```
     
-- If you fail to apply the above patch, you can simply use [my MXNet repository](https://github.com/zlmzju/mxnet/tree/fusenet):
+- (Recommended) If you fail to apply the above patch, you can simply use [my MXNet repository](https://github.com/zlmzju/mxnet/tree/fusenet):
     
     ```shell
 git clone --recursive -b fusenet https://github.com/zlmzju/mxnet.git
@@ -59,12 +59,12 @@ git clone --recursive -b fusenet https://github.com/zlmzju/mxnet.git
 Step by step tutorial with jupyter notebook is now available, please check the file [tutorial.ipynb](tutorial.ipynb).
 
 ### dataset
-You can prepare the `*.rec` file by yourself, or simply download the `Cifar` dataset from [data.dmlc.ml](http://data.dmlc.ml/mxnet/data/) or my [google drive](https://drive.google.com/open?id=0By55MQnF3PHCQmRhRTBuWk5DRkk), which includes both `Cifar` and `SVHN` datasets.
+You can prepare the `*.rec` file by yourself, or simply download the `Cifar` dataset from [data.dmlc.ml](http://data.dmlc.ml/mxnet/data/) or my [google drive](https://drive.google.com/open?id=0By55MQnF3PHCQmRhRTBuWk5DRkk) (recommended), which includes both `Cifar` and `SVHN` datasets.
 
 ### training
 Current code supports training different deeply-fused nets on Cifar-10, Cifar-100 and SVHN, such as `plain` network, `resnet`, `cross` (dfn-mr),`half` (dfn-il), `side` (dfn-il without identities), `fuse3` (three fusions), `fuse6` (six fusions), and `ensemble` (with sharing weights, training code will come later). All the networks are contained in the `network` folder.
 
-Note that the codes for training on `ImageNet`  are available in the `network/imagenet` folder, but they still need refactoring to merge into the main codes.
+Note that the codes for training on `ImageNet`  are available in the [imagenet](https://github.com/zlmzju/fusenet/tree/imagenet) branch, but they still need refactoring to merge into the `master` branch.
 
 For example, running the following command can train the `DFN-MR` network (we call it `cross` in the coding stage) on Cifar-10.
 

@@ -14,7 +14,7 @@ class FuseNet(object):
     def get_conv(self, name, data, kout, kernel, stride, pad, relu=True):
         #Conv-BN-ReLU style
         data=mx.sym.Convolution(name=name+'_conv', data=data, num_filter=kout, kernel=kernel, stride=stride, pad=pad, no_bias=True)
-        data=mx.sym.BatchNorm(name=name + '_bn', data=data, fix_gamma=False, momentum=0.99, eps=2e-5)
+        data=mx.sym.BatchNorm(name=name + '_bn', data=data, fix_gamma=False, momentum=0.9, eps=2e-5)
         if relu:
             data=mx.sym.Activation(name=name + '_relu', data=data, act_type='relu')
         return data

@@ -30,7 +30,7 @@ def main(argv):
     args = options.get_args(argv,parse=False)
     net = options.get_network(args)
     args.network+='_d%d'%args.depth
-    file_name=show_net(args.network,args.data_shape)
+    file_name=show_net(net,args.network,args.data_shape)
 
 
 if __name__ == '__main__':

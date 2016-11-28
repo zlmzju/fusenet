@@ -65,6 +65,8 @@ def __logging_args(args):
         random_idx=1
         while os.path.isfile(args.model_prefix+logfile_name+str(random_idx)+'.txt'):
             random_idx+=1
+        if args.load_epoch is not None: #deprecated. Use `--model-prefix` to manually set the name
+        	random_idx-=1
         logfile_name+=str(random_idx)
     #model related
     if args.checkpoint_epochs is None: #if num_epochs=400, then we will save the model every 50 epochs
