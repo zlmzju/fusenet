@@ -35,9 +35,12 @@ DFN-MR1 |   56  |  1.7M   |   4.94   |   24.46  |   1.66
 DFN-MR2 |   32  |  14.9M  |   3.94   |   19.25  | **1.51** 
 DFN-MR3 |   50  |  24.8M  | **3.57** | **19.00**|   1.55   
 
-- Empirical results on ImageNet:
+- Training and validation error (%) on ImageNet:
 
-![imagenet_curve](visualize/paper/imagenet_curve.png)
+Method  | Depth | #Params | Top-1 train | Top-5 train | Top-1 val | Top-5 val |  
+--------|:-----:|:-------:|:-----------:|:-----------:|:---------:|:---------:|
+ResNet  |   98  |  45.0M  |    15.09    |     3.25    |   23.38   |    6.79   |
+DFN-MR  |   50  |  46.4M  |  **14.46**  |   **3.16**  | **23.16** |  **6.61** |
 
 ## Requirements
 - Install [MXNet](http://mxnet.readthedocs.io/en/latest/how_to/build.html) on a machine (Windows, Linux, and Mac OS) with CUDA GPU and optional [cuDNN](https://developer.nvidia.com/cudnn).
