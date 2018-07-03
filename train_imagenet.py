@@ -60,7 +60,7 @@ args = parser.parse_args()
 # network
 import importlib
 import sys
-net = importlib.import_module(args.network).get_symbol(args.num_classes,args.depth)
+net = importlib.import_module(args.network).get_symbol(args.num_classes)
 os.environ["CUDA_VISIBLE_DEVICES"]=args.gpus
 os.environ["MXNET_CUDNN_AUTOTUNE_DEFAULT"]='1'
 if args.rand_seed is None:
