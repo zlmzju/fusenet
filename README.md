@@ -48,13 +48,13 @@ DFN-MR  |   50  |  46.4M  |  **14.46**  |   **3.16**  | **23.16** |  **6.61** |
 - Apply my modified data processing patch on the latest MXNet by merging the pull request:
     
     ```shell
-git pull origin pull/3936/head master
+    git pull origin pull/3936/head master
     ```
     
 - (Recommended) If you fail to apply the above patch, you can simply use [my MXNet repository](https://github.com/zlmzju/mxnet/tree/fusenet):
     
     ```shell
-git clone --recursive -b fusenet https://github.com/zlmzju/mxnet.git
+    git clone --recursive -b fusenet https://github.com/zlmzju/mxnet.git
     ```
 
 ## How to Train
