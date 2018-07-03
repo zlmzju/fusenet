@@ -63,16 +63,22 @@ Step by step tutorial with jupyter notebook is now available, please check the f
 
 ### dataset
 You can prepare the `*.rec` file by yourself, or simply download the `Cifar` dataset from [data.dmlc.ml](http://data.dmlc.ml/mxnet/data/) or my [google drive](https://drive.google.com/open?id=0By55MQnF3PHCQmRhRTBuWk5DRkk) (recommended), which includes both `Cifar` and `SVHN` datasets.
+For ImageNet dataset, follow the [mxnet official document](http://mxnet.incubator.apache.org/tutorials/vision/large_scale_classification.html?highlight=imagenet)
+to prepare.
 
 ### training
-Current code supports training different deeply-fused nets on Cifar-10, Cifar-100 and SVHN, such as `plain` network, `resnet`, `cross` (dfn-mr),`half` (dfn-il), `side` (dfn-il without identities), `fuse3` (three fusions), `fuse6` (six fusions), and `ensemble` (with sharing weights, training code will come later). All the networks are contained in the `network` folder.
-
-Note that the codes for training on `ImageNet`  are available in the [imagenet](https://github.com/zlmzju/fusenet/tree/imagenet) branch, but they still need refactoring to merge into the `master` branch.
+Current code supports training different deeply-fused nets on Cifar-10, Cifar-100, SVHN and ImageNet, such as `plain` network, `resnet`, `cross` (dfn-mr),`half` (dfn-il), `side` (dfn-il without identities), `fuse3` (three fusions), `fuse6` (six fusions), and `ensemble` (with sharing weights, training code will come later). All the networks are contained in the `network` folder.
 
 For example, running the following command can train the `DFN-MR` network (we call it `cross` in the coding stage) on Cifar-10.
 
 ```shell
 python train_model.py --dataset=cifar10 --network=cross --depth=56 --gpus=0,1 --dataset=<dataset location>
+```
+
+To train DFN-MR network on ImageNet, run
+
+```shell
+python train_imagenet.py --network=symbol_cross --gpus=0,1,2,3 --data-dir=<dataset location>
 ```
 
 ## Other usages
