@@ -3,7 +3,7 @@ Reproducing https://github.com/gcr/torch-residual-networks
 
 References:
 
-Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun. "Deep Residual Learning for Image Recognition"
+Kaimin He, Xiangyu Zhang, Shaoqing Ren, Jian Sun. "Deep Residual Learning for Image Recognition"
 '''
 import mxnet as mx
 import argparse
@@ -13,24 +13,22 @@ import time
 import numpy as np
 
 parser = argparse.ArgumentParser(description='train an image classifer on ImageNet')
-parser.add_argument('--network', type=str, default='resnet_origin',
-                    help = 'the cnn to use, choices = [\'resnet_origin\', \'resnet_plain\', \'resnet_fuse[1,2]\']')
-parser.add_argument('--depth', type=int, default=26,
-                    help = 'depth (20,32,56,110)')
-parser.add_argument('--data-dir', type=str, default='../../../dataset/imagenet/',
+parser.add_argument('--network', type=str, default='symbol_cross',
+                    help = 'the cnn to use, choices = [\'symbol_cross\', \'symbol_resnet\']')
+parser.add_argument('--data-dir', type=str, default=r'../imagenet/',
                     help='the input data directory')
 parser.add_argument('--gpus', type=str, default='0,1,2,3',
-                    help='the gpus will be used, e.g "0,1,2,3"')
+                    help='the gpus will be used, e.g "0,1,2,3,4,5,6,7"')
 parser.add_argument('--batch-size', type=int, default=256,
                     help='the batch size')
-parser.add_argument('--model-prefix', type=str, default='./snapshot/',
+parser.add_argument('--model-prefix', type=str, default='./imagenet/',
                     help='the prefix of the model to load/save')
 parser.add_argument('--load-model', type=str, 
                     help='the name of the model to load')
-parser.add_argument('--num-epochs', type=int, default=200,
+parser.add_argument('--num-epochs', type=int, default=120,
                     help='the number of training epochs')
 parser.add_argument('--log-file', type=str, default='log.txt', help='the name of log file')
-parser.add_argument('--log-dir', type=str, default='./snapshot/', help='directory of the log file')
+parser.add_argument('--log-dir', type=str, default='./imagenet/', help='directory of the log file')
 parser.add_argument('--lr', type=float, default=0.1,
                     help='the initial learning rate')
 parser.add_argument('--lr-factor', type=float, default=0.1,
@@ -61,7 +59,8 @@ args = parser.parse_args()
 
 # network
 import importlib
-net = importlib.import_module('symbol_' + args.network).get_symbol(args.num_classes,args.depth)
+import sys
+net = importlib.import_module(args.network).get_symbol(args.num_classes,args.depth)
 os.environ["CUDA_VISIBLE_DEVICES"]=args.gpus
 os.environ["MXNET_CUDNN_AUTOTUNE_DEFAULT"]='1'
 if args.rand_seed is None:
@@ -69,7 +68,7 @@ if args.rand_seed is None:
     args.rand_seed=int(time.time()) #different random init for serveral runs
 mx.random.seed(args.rand_seed)      #cudnn conv backward is non-deterministic
 exp_name=args.log_file[:args.log_file.rfind('.')]
-args.network='net_d%d_'%(args.depth)+args.network+'/'+args.network+'_'+exp_name+'/'+args.network
+args.network='net_'+args.network+'/'+args.network+'_'+exp_name+'/'+args.network
 
 def get_iterator(args, kv):
     kargs = dict(
@@ -126,6 +125,47 @@ def get_iterator(args, kv):
     )
     return (train, val)
 
+class Init(mx.init.Xavier):
+    def __init__(self,rnd_type="uniform", factor_type="avg", magnitude=3):
+        self.rnd_type = rnd_type
+        self.factor_type = factor_type
+        self.magnitude = float(magnitude)
+
+    def __call__(self, name, arr):
+        """Override () function to do Initialization
+
+        Parameters
+        ----------
+        name : str
+            name of corrosponding ndarray
+
+        arr : NDArray
+            ndarray to be Initialized
+        """
+        if not isinstance(name, mx.base.string_types):
+            raise TypeError('name must be string')
+        if not isinstance(arr, mx.ndarray.NDArray):
+            raise TypeError('arr must be NDArray')
+        if name.endswith('upsampling'):
+            self._init_bilinear(name, arr)
+        elif name.endswith('bias'):
+            self._init_bias(name, arr)
+        elif name.endswith('gamma'):
+            self._init_gamma(name, arr)
+        elif name.endswith('beta'):
+            self._init_beta(name, arr)
+        elif name.endswith('weight'):
+            self._init_weight(name, arr)
+        elif name.endswith("moving_mean"):
+            self._init_zero(name, arr)
+        elif name.endswith("moving_var"):
+            self._init_zero(name, arr)
+        elif name.endswith("moving_inv_var"):
+            self._init_zero(name, arr)
+        elif name.endswith("moving_avg"):
+            self._init_zero(name, arr)
+        else:
+            self._init_default(name, arr)
 
         
 class Scheduler(mx.lr_scheduler.MultiFactorScheduler):
@@ -147,10 +187,11 @@ class Nesterov(mx.optimizer.NAG):
                 or n.endswith('_bias')
                 or n.endswith('_gamma')
                 or n.endswith('_beta')
+                or n.endswith('weightfuse')
             ):
                 self.wd_mult[n] = 0.0
         if self.sym is not None:
-            attr = self.sym.list_attr(recursive=True)
+            attr = self.sym.attr_dict()
             for k, v in attr.items():
                 if k.endswith('_wd_mult'):
                     self.wd_mult[k[:-len('_wd_mult')]] = float(v)
@@ -222,8 +263,8 @@ def fit(args, network, data_loader, batch_end_callback=None):
         log_dir=os.path.dirname(log_file_full_name)
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
-        import shutil
-        shutil.copy('train_imagenet.py', os.path.join(log_dir, 'training.py'))
+        # import shutil
+        # shutil.copy('train_imagenet.py', os.path.join(log_dir, 'training.py'))
         logger = logging.getLogger()
         handler = logging.FileHandler(log_file_full_name)
         formatter = logging.Formatter(head)
@@ -268,7 +309,7 @@ def fit(args, network, data_loader, batch_end_callback=None):
                       'aux_params': tmp_aux_params}
 
     # save model
-    checkpoint = mx.callback.do_checkpoint(model_prefix,1)
+    checkpoint = mx.callback.do_checkpoint(model_prefix,5)
 
     # data
     (train, val) = data_loader(args, kv)
@@ -314,7 +355,7 @@ def fit(args, network, data_loader, batch_end_callback=None):
         initializer=mx.init.Mixed(
             ['.*fc.*', '.*'],
             [mx.init.Xavier(rnd_type='uniform',  factor_type='in', magnitude=1),
-             mx.init.Xavier(rnd_type='gaussian', factor_type='in', magnitude=2)]
+             Init(rnd_type='gaussian', factor_type='in', magnitude=2)]
         ),
         #lr_scheduler=Scheduler(epoch_step=[30, 60, 90, 120, 150, 180], factor=0.1, epoch_size=epoch_size),
         **model_args)
