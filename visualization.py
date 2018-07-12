@@ -228,8 +228,10 @@ def plot_network(symbol, shape=None, node_attrs={},ignore_nodes=[], title="plot"
                             key = input_name[:input_name.rfind('_')] + "_output"
                             shape = shape_dict[key][1:]
                             label = "x".join([str(x) for x in shape])
+                            
                             # attr["label"] = label
                             # attr['fontsize']="46"
+
                         else:
                             key = input_name[:input_name.rfind('_')]
                             shape = shape_dict[key][1:]

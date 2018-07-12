@@ -35,9 +35,12 @@ DFN-MR1 |   56  |  1.7M   |   4.94   |   24.46  |   1.66
 DFN-MR2 |   32  |  14.9M  |   3.94   |   19.25  | **1.51** 
 DFN-MR3 |   50  |  24.8M  | **3.57** | **19.00**|   1.55   
 
-- Empirical results on ImageNet:
+- Training and validation error (%) on ImageNet:
 
-![imagenet_curve](visualize/paper/imagenet_curve.png)
+Method  | Depth | #Params | Top-1 train | Top-5 train | Top-1 val | Top-5 val |  
+--------|:-----:|:-------:|:-----------:|:-----------:|:---------:|:---------:|
+ResNet  |   98  |  45.0M  |    15.09    |     3.25    |   23.38   |    6.79   |
+DFN-MR  |   50  |  46.4M  |  **14.46**  |   **3.16**  | **23.16** |  **6.61** |
 
 ## Requirements
 - Install [MXNet](http://mxnet.readthedocs.io/en/latest/how_to/build.html) on a machine (Windows, Linux, and Mac OS) with CUDA GPU and optional [cuDNN](https://developer.nvidia.com/cudnn).
@@ -45,13 +48,13 @@ DFN-MR3 |   50  |  24.8M  | **3.57** | **19.00**|   1.55
 - Apply my modified data processing patch on the latest MXNet by merging the pull request:
     
     ```shell
-git pull origin pull/3936/head master
+    git pull origin pull/3936/head master
     ```
     
 - (Recommended) If you fail to apply the above patch, you can simply use [my MXNet repository](https://github.com/zlmzju/mxnet/tree/fusenet):
     
     ```shell
-git clone --recursive -b fusenet https://github.com/zlmzju/mxnet.git
+    git clone --recursive -b fusenet https://github.com/zlmzju/mxnet.git
     ```
 
 ## How to Train
@@ -60,16 +63,22 @@ Step by step tutorial with jupyter notebook is now available, please check the f
 
 ### dataset
 You can prepare the `*.rec` file by yourself, or simply download the `Cifar` dataset from [data.dmlc.ml](http://data.dmlc.ml/mxnet/data/) or my [google drive](https://drive.google.com/open?id=0By55MQnF3PHCQmRhRTBuWk5DRkk) (recommended), which includes both `Cifar` and `SVHN` datasets.
+For ImageNet dataset, follow the [mxnet official document](http://mxnet.incubator.apache.org/tutorials/vision/large_scale_classification.html?highlight=imagenet)
+to prepare.
 
 ### training
-Current code supports training different deeply-fused nets on Cifar-10, Cifar-100 and SVHN, such as `plain` network, `resnet`, `cross` (dfn-mr),`half` (dfn-il), `side` (dfn-il without identities), `fuse3` (three fusions), `fuse6` (six fusions), and `ensemble` (with sharing weights, training code will come later). All the networks are contained in the `network` folder.
-
-Note that the codes for training on `ImageNet`  are available in the [imagenet](https://github.com/zlmzju/fusenet/tree/imagenet) branch, but they still need refactoring to merge into the `master` branch.
+Current code supports training different deeply-fused nets on Cifar-10, Cifar-100, SVHN and ImageNet, such as `plain` network, `resnet`, `cross` (dfn-mr),`half` (dfn-il), `side` (dfn-il without identities), `fuse3` (three fusions), `fuse6` (six fusions), and `ensemble` (with sharing weights, training code will come later). All the networks are contained in the `network` folder.
 
 For example, running the following command can train the `DFN-MR` network (we call it `cross` in the coding stage) on Cifar-10.
 
 ```shell
 python train_model.py --dataset=cifar10 --network=cross --depth=56 --gpus=0,1 --dataset=<dataset location>
+```
+
+To train DFN-MR network on ImageNet, run
+
+```shell
+python train_imagenet.py --network=symbol_cross --gpus=0,1,2,3 --data-dir=<dataset location>
 ```
 
 ## Other usages
